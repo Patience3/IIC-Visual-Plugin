@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Least privilege: this workflow can only read the repository.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs-and-policy:
+    name: Repository policy checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Required documents exist
+        run: |
+          for f in README.md SECURITY.md docs/DISCUSSION_LOG.md docs/DEFINITION_OF_DONE.md docs/DEVELOPMENT.md; do
+            test -f "$f" || { echo "Missing $f"; exit 1; }
+          done
+
+  build-and-test:
+    name: Build, test and audit
+    runs-on: ubuntu-latest
+    # Skips cleanly until the code scaffold (package.json) is added.
+    if: ${{ hashFiles('package.json') != '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
+      - name: Install dependencies from the lockfile only
+        run: pnpm install --frozen-lockfile
+      - name: Type check
+        run: pnpm run --if-present typecheck
+      - name: Lint
+        run: pnpm run --if-present lint
+      - name: Unit tests
+        run: pnpm run --if-present test
+      - name: Dependency audit (fails on high or critical)
+        run: pnpm audit --audit-level=high
+      - name: Build extension
+        run: pnpm run build
+      - name: Check manifest permissions and CSP
+        run: node scripts/check-manifest.mjs
+      - name: Upload preview build
+        uses: actions/upload-artifact@v4
+        with:
+          name: iic-visual-plugin-${{ github.sha }}
+          path: dist/
+          retention-days: 14

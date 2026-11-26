@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write   # needed only to create the GitHub Release
+
+jobs:
+  release:
+    name: Build and publish release package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run --if-present test
+      - run: pnpm run build
+      - run: node scripts/check-manifest.mjs
+      - name: Package extension
+        run: cd dist && zip -r "../iic-visual-plugin-${GITHUB_REF_NAME}.zip" .
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: iic-visual-plugin-${{ github.ref_name }}.zip
+          generate_release_notes: true

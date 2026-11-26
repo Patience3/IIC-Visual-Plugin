@@ -14,6 +14,9 @@ This module plugs into one shared Chrome extension and toolbar, built together w
 | Quality bar | [Definition of Done](docs/DEFINITION_OF_DONE.md) |
 | Who does what | [Team and groups](docs/TEAM.md) |
 | Working with the other team | [Integration plan](docs/INTEGRATION.md) |
+| Decisions and code changes | [Discussion Log](docs/DISCUSSION_LOG.md) |
+| Security rules | [Security Policy](SECURITY.md) |
+| Build, run and test | [Development Guide](docs/DEVELOPMENT.md) |
 
 ## What this module does (MVP)
 
@@ -37,4 +40,8 @@ Chrome Manifest V3, TypeScript (strict), Vite, Preact toolbar in Shadow DOM, `ch
 
 ## Getting started
 
-Setup instructions will be added once the shared scaffold exists (see issue "Set up the shared scaffold").
+See the [Development Guide](docs/DEVELOPMENT.md) to load the latest preview build into Chrome or to run the plugin from source. The code scaffold is added in Sprint 1.
+
+## Security
+
+This project follows a security-first approach: minimal permissions, no data leaving the device by default, and automated security checks on every pull request. See [SECURITY.md](SECURITY.md).

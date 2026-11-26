@@ -18,9 +18,16 @@ A task is done only when **every** box applies. If one can't be met, write why i
 - [ ] Tested together with the other team's module switched on
 - [ ] No personal data collected or stored
 
+## Security (see [SECURITY.md](../SECURITY.md))
+- [ ] CI passes, including the dependency audit, CodeQL scan and manifest permission check
+- [ ] No new permission, or the permission is approved and recorded in the [Discussion Log](DISCUSSION_LOG.md)
+- [ ] No unsafe DOM or code APIs (`innerHTML`, `eval`, `new Function`)
+- [ ] Page content treated as untrusted input
+
 ## Documentation
 - [ ] User-facing behaviour described in the user guide
 - [ ] Any change to the shared contract agreed with the other team first
+- [ ] Decisions that change the code are recorded in the [Discussion Log](DISCUSSION_LOG.md) and linked from the pull request
 
 ## Sprint is done when
 - [ ] The sprint goal checkpoint in [TIMELINE.md](TIMELINE.md) can be demonstrated live
