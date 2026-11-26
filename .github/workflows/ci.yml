@@ -56,7 +56,7 @@ jobs:
       - name: Check manifest permissions and CSP
         run: node scripts/check-manifest.mjs
       - name: Upload preview build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: iic-visual-plugin-${{ github.sha }}
           path: dist/
