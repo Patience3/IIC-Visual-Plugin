@@ -1,0 +1,36 @@
+name: Set up sprint milestones (one-off)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  milestones:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Create milestones and assign issues by sprint label
+        run: |
+          set -euo pipefail
+          create() {
+            local title="$1" due="$2" desc="$3"
+            num=$(gh api "repos/$REPO/milestones?state=all&per_page=100" --jq ".[] | select(.title==\"$title\") | .number")
+            if [ -z "$num" ]; then
+              num=$(gh api "repos/$REPO/milestones" -f title="$title" -f due_on="$due" -f description="$desc" --jq .number)
+            fi
+            echo "$num"
+          }
+          s1=$(create "Sprint 1" "2026-11-29T23:00:00Z" "Foundation: shared decisions agreed, scaffold, personas, text enlargement working.")
+          s2=$(create "Sprint 2" "2026-12-03T23:00:00Z" "Build and integrate: all Must features in the shared toolbar; integrated demo with the Cognitive team.")
+          s3=$(create "Sprint 3" "2026-12-08T23:00:00Z" "Test, fix, ship: accessibility and usability testing, documentation, v1.0.0 release.")
+          for pair in "sprint 1:$s1" "sprint 2:$s2" "sprint 3:$s3"; do
+            label="${pair%%:*}"; m="${pair##*:}"
+            for n in $(gh api "repos/$REPO/issues?state=all&labels=$(printf %s "$label" | sed 's/ /%20/g')&per_page=100" --jq '.[] | select(.pull_request == null) | .number'); do
+              gh api -X PATCH "repos/$REPO/issues/$n" -F milestone="$m" --silent
+              echo "Issue #$n -> $label (milestone $m)"
+            done
+          done
