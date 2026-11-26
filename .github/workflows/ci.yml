@@ -18,7 +18,7 @@ jobs:
     name: Repository policy checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - name: Required documents exist
@@ -33,7 +33,7 @@ jobs:
     # Skips cleanly until the code scaffold (package.json) is added.
     if: ${{ hashFiles('package.json') != '' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: pnpm/action-setup@v4
